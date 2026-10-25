@@ -188,8 +188,7 @@ with st.form("customer_details"):
 # Build dataframe and predict
 # --------------------------------------------------
 if submitted:
-  
-input_values = {
+  input_values = {
     "Unnamed: 0": 0,  # Add the missing index feature
     "Age": age,
     "TypeofContact": contact_type,
