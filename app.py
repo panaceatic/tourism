@@ -188,23 +188,24 @@ with st.form("customer_details"):
 # Build dataframe and predict
 # --------------------------------------------------
 if submitted:
-    input_values = {
-        "Age": age,
-        "TypeofContact": contact_type,
-        "CityTier": city_tier,
-        "Occupation": occupation,
-        "Gender": gender,
-        "MaritalStatus": marital_status,
-        "Designation": designation,
-        "NumberOfPersonVisiting": persons_visiting,
-        "PreferredPropertyStar": property_star,
-        "NumberOfTrips": number_of_trips,
-        "Passport": 1 if passport == "Yes" else 0,
-        "OwnCar": 1 if own_car == "Yes" else 0,
-        "NumberOfChildrenVisiting": children_visiting,
-        "MonthlyIncome": monthly_income,
-    }
-
+  
+input_values = {
+    "Unnamed: 0": 0,  # Add the missing index feature
+    "Age": age,
+    "TypeofContact": contact_type,
+    "CityTier": city_tier,
+    "Occupation": occupation,
+    "Gender": gender,
+    "MaritalStatus": marital_status,
+    "Designation": designation,
+    "NumberOfPersonVisiting": persons_visiting,
+    "PreferredPropertyStar": property_star,
+    "NumberOfTrips": number_of_trips,
+    "Passport": 1 if passport == "Yes" else 0,
+    "OwnCar": 1 if own_car == "Yes" else 0,
+    "NumberOfChildrenVisiting": children_visiting,
+    "MonthlyIncome": monthly_income,
+}
     missing_features = [
         column for column in feature_columns
         if column not in input_values
