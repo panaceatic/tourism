@@ -73,6 +73,11 @@ except Exception as exc:
 
 feature_columns = metadata.get("feature_columns")
 
+# Remove an accidental CSV index column
+feature_columns = [
+    col for col in feature_columns
+    if col != "Unnamed: 0"
+]
 if not feature_columns:
     st.error(
         "The metadata file must contain 'feature_columns' "
