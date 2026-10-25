@@ -1,14 +1,19 @@
 
+
 from pathlib import Path
 import json
 
-import joblib
-import pandas as pd
 import streamlit as st
+import sklearn
+import joblib
+import numpy
+import pandas as pd
+
 st.write("Diagnostic: app.py started")
 st.write("scikit-learn:", sklearn.__version__)
 st.write("joblib:", joblib.__version__)
 st.write("NumPy:", numpy.__version__)
+
 # --------------------------------------------------
 # Paths
 # --------------------------------------------------
