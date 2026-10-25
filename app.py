@@ -71,13 +71,9 @@ except Exception as exc:
     st.error(f"Unable to load the trained model: {exc}")
     st.stop()
 
+
 feature_columns = metadata.get("feature_columns")
 
-# Remove an accidental CSV index column
-feature_columns = [
-    col for col in feature_columns
-    if col != "Unnamed: 0"
-]
 if not feature_columns:
     st.error(
         "The metadata file must contain 'feature_columns' "
@@ -97,16 +93,11 @@ with st.form("customer_details"):
         age = st.number_input(
             "Age", min_value=18, max_value=100, value=30
         )
-
         contact_type = st.selectbox(
             "Type of Contact",
             ["Company Invited", "Self Inquiry"],
         )
-
-        city_tier = st.selectbox(
-            "City Tier", [1, 2, 3]
-        )
-
+        city_tier = st.selectbox("City Tier", [1, 2, 3])
         occupation = st.selectbox(
             "Occupation",
             [
@@ -116,66 +107,36 @@ with st.form("customer_details"):
                 "Freelancer",
             ],
         )
-
-        gender = st.selectbox(
-            "Gender", ["Male", "Female"]
-        )
-
+        gender = st.selectbox("Gender", ["Male", "Female"])
         marital_status = st.selectbox(
             "Marital Status",
             ["Married", "Single", "Divorced", "Unmarried"],
         )
-
         designation = st.selectbox(
             "Designation",
-            [
-                "Executive",
-                "Manager",
-                "Senior Manager",
-                "AVP",
-                "VP",
-            ],
+            ["Executive", "Manager", "Senior Manager", "AVP", "VP"],
         )
 
     with col2:
         persons_visiting = st.number_input(
             "Number of Persons Visiting",
-            min_value=1,
-            max_value=20,
-            value=2,
+            min_value=1, max_value=20, value=2
         )
-
         property_star = st.selectbox(
             "Preferred Property Star", [3, 4, 5]
         )
-
         number_of_trips = st.number_input(
-            "Number of Trips",
-            min_value=0,
-            max_value=100,
-            value=2,
+            "Number of Trips", min_value=0, max_value=100, value=2
         )
-
-        passport = st.selectbox(
-            "Has Passport?", ["Yes", "No"]
-        )
-
-        own_car = st.selectbox(
-            "Owns a Car?", ["Yes", "No"]
-        )
-
+        passport = st.selectbox("Has Passport?", ["Yes", "No"])
+        own_car = st.selectbox("Owns a Car?", ["Yes", "No"])
         children_visiting = st.number_input(
             "Number of Children Visiting",
-            min_value=0,
-            max_value=20,
-            value=0,
+            min_value=0, max_value=20, value=0
         )
-
         monthly_income = st.number_input(
-            "Monthly Income",
-            min_value=0.0,
-            value=30000.0,
-            step=1000.0,
+            "Monthly Income", min_value=0.0,
+            value=30000.0, step=1000.0
         )
 
     submitted = st.form_submit_button(
@@ -188,37 +149,33 @@ with st.form("customer_details"):
 # Build dataframe and predict
 # --------------------------------------------------
 if submitted:
-  input_values = {
-    "Unnamed: 0": 0,  # Add the missing index feature
-    "Age": age,
-    "TypeofContact": contact_type,
-    "CityTier": city_tier,
-    "Occupation": occupation,
-    "Gender": gender,
-    "MaritalStatus": marital_status,
-    "Designation": designation,
-    "NumberOfPersonVisiting": persons_visiting,
-    "PreferredPropertyStar": property_star,
-    "NumberOfTrips": number_of_trips,
-    "Passport": 1 if passport == "Yes" else 0,
-    "OwnCar": 1 if own_car == "Yes" else 0,
-    "NumberOfChildrenVisiting": children_visiting,
-    "MonthlyIncome": monthly_income,
-}
+    input_values = {
+        "Unnamed: 0": 0,
+        "Age": age,
+        "TypeofContact": contact_type,
+        "CityTier": city_tier,
+        "Occupation": occupation,
+        "Gender": gender,
+        "MaritalStatus": marital_status,
+        "Designation": designation,
+        "NumberOfPersonVisiting": persons_visiting,
+        "PreferredPropertyStar": property_star,
+        "NumberOfTrips": number_of_trips,
+        "Passport": 1 if passport == "Yes" else 0,
+        "OwnCar": 1 if own_car == "Yes" else 0,
+        "NumberOfChildrenVisiting": children_visiting,
+        "MonthlyIncome": monthly_income,
+    }
+
     missing_features = [
         column for column in feature_columns
         if column not in input_values
     ]
 
     if missing_features:
-        st.error(
-            "The following model features have no corresponding "
-            f"input fields: {missing_features}. "
-            "Update app.py to match the training features."
-        )
+        st.error(f"Missing input fields: {missing_features}")
         st.stop()
 
-    # Preserve the exact feature order used during training.
     input_df = pd.DataFrame(
         [[input_values[column] for column in feature_columns]],
         columns=feature_columns,
@@ -234,31 +191,26 @@ if submitted:
 
         if prediction == 1:
             st.success(
-                "The model predicts that the customer is likely "
-                "to purchase the tourism package."
+                "The customer is likely to purchase the tourism package."
             )
         else:
             st.info(
-                "The model predicts that the customer is unlikely "
-                "to purchase the tourism package."
+                "The customer is unlikely to purchase the tourism package."
             )
 
-        # Display probability when supported by the model.
         if hasattr(model, "predict_proba"):
             probabilities = model.predict_proba(input_df)[0]
             classes = list(model.classes_)
 
             if 1 in classes:
-                purchase_probability = float(
+                probability = float(
                     probabilities[classes.index(1)]
                 )
-
                 st.metric(
                     "Estimated Purchase Probability",
-                    f"{purchase_probability:.1%}",
+                    f"{probability:.1%}",
                 )
-
-                st.progress(purchase_probability)
+                st.progress(probability)
 
     except Exception as exc:
         st.error(f"Prediction failed: {exc}")
